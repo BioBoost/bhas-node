@@ -1,0 +1,13 @@
+{
+  "requires": [
+    "bare-metal",
+    "events",
+    "bhas"
+  ],
+  "target_overrides": {
+      "*": {
+          "target.c_lib": "small",
+          "platform.stdio-baud-rate": 115200
+      }
+  }
+}
