@@ -2,12 +2,30 @@
   "requires": [
     "bare-metal",
     "events",
-    "bhas"
+    "bhas",
+    "mbed-trace"
   ],
+  "config": {
+    "command-console-timeout": 10
+  },
   "target_overrides": {
-      "*": {
-          "target.c_lib": "small",
-          "platform.stdio-baud-rate": 115200
-      }
+    "*": {
+      "target.c_lib": "small",
+      "platform.stdio-baud-rate": 115200,
+      "mbed-trace.enable": true,
+      "mbed-trace.max-level": "TRACE_LEVEL_DEBUG",
+      "target.components_add": ["FLASH", "FLASHIAP"],
+      "target.features_add": ["STORAGE"]
+    },
+    "NUCLEO_L073RZ": {
+      "flashiap-block-device.size": "(8*1024)",
+      "flashiap-block-device.base-address": "(MBED_ROM_START + MBED_ROM_SIZE - (8*1024))",
+      "target.restrict_size": "0x2E000"
+    },
+    "NUCLEO_L476RG": {
+      "flashiap-block-device.size": "(8*1024)",
+      "flashiap-block-device.base-address": "(MBED_ROM_START + MBED_ROM_SIZE - (8*1024))",
+      "target.restrict_size": "0xFE000"
+    }
   }
 }
