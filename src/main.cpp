@@ -59,9 +59,11 @@ int main() {
 
 #if defined(TARGET_NUCLEO_L476RG)
   CAN canBus(D15, D14);
+  canBus.frequency(100*1000);
   CANChannel channel(canBus);
 #elif defined(TARGET_LPC1768)
   CAN canBus(p30, p29);
+  canBus.frequency(100*1000);
   CANChannel channel(canBus);
 #else
   LocalEchoChannel channel;
@@ -73,3 +75,6 @@ int main() {
   tr_info("Passing control to node");
   node.dispatch_forever();
 }
+
+// TODO: Send hello @ boot
+// TODO: Send alive every 5 minutes or so
