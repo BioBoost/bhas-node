@@ -1,7 +1,8 @@
 #include "mbed_events.h"
 #include "mbed.h"
-#include "four_switch_node.h"
-#include "relay_node.h"
+#include "nucleo_l476.h"
+#include "lpc_1768.h"
+#include "node.h"
 #include "local_echo_channel.h"
 #include "version.h"
 #include "mbed_trace.h"
@@ -15,8 +16,9 @@ using BHAS::Communication::Channels::CANChannel;
 
 #define TRACE_GROUP "BHAS Node main"
 
-using BHAS::Nodes::FourSwitchNode;
-using BHAS::Nodes::RelayNode;
+using BHAS::Nodes::NucleoL476;
+using BHAS::Nodes::Lpc1768;
+using BHAS::Node;
 using BHAS::Communication::Channels::LocalEchoChannel;
 using BHAS::ConfigurationManager;
 using BHAS::CommandManager;
@@ -34,7 +36,9 @@ int main() {
   const char* profile = "bare-metal";
 #endif
   tr_info("Mbed OS version: %d.%d.%d (profile: %s)", MBED_MAJOR_VERSION, MBED_MINOR_VERSION, MBED_PATCH_VERSION, profile);
-    
+
+
+#if !defined(TARGET_LPC1768)   
   ConfigurationManager config;
   config.init();
   tr_info("This device has booted %lu times", config.boot_count());
@@ -56,6 +60,7 @@ int main() {
       commandManager.dispatch();
     }
   }
+#endif
 
 #if defined(TARGET_NUCLEO_L476RG)
   CAN canBus(D15, D14);
@@ -69,12 +74,14 @@ int main() {
   LocalEchoChannel channel;
 #endif
 
-  FourSwitchNode node(config.node_id(), config.gateway_id(), channel);
-  // RelayNode node(config.node_id(), config.gateway_id(), localEchoChannel);
+#if defined(TARGET_NUCLEO_L476RG)
+  NucleoL476 node(config.node_id(), config.gateway_id(), channel);
+#elif defined(TARGET_LPC1768)
+  Lpc1768 node(1, 0, channel);
+#else
+  Node node(config.node_id(), config.gateway_id(), channel);
+#endif
 
   tr_info("Passing control to node");
   node.dispatch_forever();
 }
-
-// TODO: Send hello @ boot
-// TODO: Send alive every 5 minutes or so
